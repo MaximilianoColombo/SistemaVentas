@@ -77,8 +77,8 @@ public class Sistemas extends javax.swing.JFrame {
             ob[0]=listaPr.get(i).getID();
             ob[1]=listaPr.get(i).getCUIT();
             ob[2]=listaPr.get(i).getNombre();
-            ob[3]=listaPr.get(i).getDireccion();
-            ob[4]=listaPr.get(i).getTelefono();
+            ob[3]=listaPr.get(i).getTelefono();
+            ob[4]=listaPr.get(i).getDireccion();
             ob[5]=listaPr.get(i).getRazon();
             modelo.addRow(ob);  
             tableProveedores.setModel(modelo);
