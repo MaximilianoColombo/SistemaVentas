@@ -65,13 +65,12 @@ public class ProveedorDAO {
         return listaPr;
     }
     
-    public void modificarProveedor(JTable tabla,Proveedor pr){
-        int filaSel = tabla.getSelectedRow();
-        String id = tabla.getValueAt(filaSel, 0).toString();//Almacena la fila seleccionada y su respectivo ID
+    public void modificarProveedor(int id,Proveedor pr){
 
         try {
             String SQL="UPDATE proveedor SET CUIT=?,nombre=?,telefono=?,direccion=?,razon=? "
                     + "WHERE id='"+id+"'"; //Consulta para actualizar la fila
+            con = cn.getConexion();
             ps = con.prepareStatement(SQL);
             ps.setInt(1, pr.getCUIT());
             ps.setString(2, pr.getNombre());
@@ -85,12 +84,10 @@ public class ProveedorDAO {
         }
     }
     
-    public void eliminarProveedor(JTable tabla){
-        int filaSel = tabla.getSelectedRow();//Almacena la fila selecionada
-        String id = tabla.getValueAt(filaSel, 0).toString();//Obtiene su ID
-
+    public void eliminarProveedor(int id){
         try {
             String SQL="DELETE FROM proveedor WHERE id='"+id+"'"; //Elimina la fila mediante SQL
+            con = cn.getConexion();
             ps=con.prepareStatement(SQL);
             ps.executeUpdate();
             ps.close();

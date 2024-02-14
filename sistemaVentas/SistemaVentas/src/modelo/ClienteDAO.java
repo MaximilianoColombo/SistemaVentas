@@ -44,12 +44,11 @@ public class ClienteDAO {
         }
     }
     
- public void eliminarCliente(JTable tabla){
-     int filaSel = tabla.getSelectedRow();//Almacena la fila selecionada
-     String id = tabla.getValueAt(filaSel, 0).toString();//Obtiene su ID
+ public void eliminarCliente(int id){
      
      try {
          String SQL="DELETE FROM clientes WHERE id='"+id+"'"; //Elimina la fila mediante SQL
+         con = cn.getConexion();
          ps=con.prepareStatement(SQL);
          ps.executeUpdate();
          ps.close();
@@ -89,13 +88,13 @@ public class ClienteDAO {
     }
 
 
-    public void modificarCliente(JTable tabla,Cliente cl){
-        int filaSel = tabla.getSelectedRow();
-        String id = tabla.getValueAt(filaSel, 0).toString();//Almacena la fila seleccionada y su respectivo ID
+    public void modificarCliente(int id,Cliente cl){
+     
 
         try {
             String SQL="UPDATE clientes SET DNI=?,nombre=?,telefono=?,direccion=?,razon=?"
                     + "WHERE id='"+id+"'"; //Consulta para actualizar la fila
+            con = cn.getConexion();
             ps = con.prepareStatement(SQL);
             ps.setInt(1, cl.getDNI());
             ps.setString(2, cl.getNombre());
@@ -108,5 +107,35 @@ public class ClienteDAO {
             System.out.println(e.toString());
         }
     }
+    
+    public String buscarCliente(int DNI) {
+      try {
+          String SQL = "SELECT nombre FROM clientes WHERE DNI=?";
+          con = cn.getConexion();
+          ps = con.prepareStatement(SQL);
+          ps.setInt(1, DNI);
+          rs = ps.executeQuery(); 
+
+          if (rs.next()) {
+              String nombre = rs.getString("nombre");
+              return nombre;
+          }
+      } catch (SQLException e) {
+          System.out.println(e.toString());
+      } finally {
+          try {
+              if (rs != null) {
+                  rs.close();
+              }
+              if (ps != null) {
+                  ps.close();
+              }
+          } catch (SQLException e) {
+              System.out.println(e.toString());
+          }
+      }
+      return "error";
+  }
+
  
 }

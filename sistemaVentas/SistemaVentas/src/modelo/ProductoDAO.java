@@ -22,31 +22,48 @@ public class ProductoDAO {
     PreparedStatement ps;
     ResultSet rs;
     
-    public String comprobarCodigoRepetido(Producto prod){
+
+    public boolean comprobarCodigo(String codigo){
         try {
             String SQL="SELECT codigo FROM productos";
             con = cn.getConexion();
             ps = con.prepareStatement(SQL);
             rs=ps.executeQuery();
-            String codigo=prod.getCodigo();
-            
-            
+
             while(rs.next()){
-                
-                 
                 if(rs.getString(1).equals(codigo)){
-                    return codigo;
-                    
+                    return true;   
                 }
-               
-                
             }
             
         } catch (SQLException e) {
             System.out.println(e.toString());
         }
-        return "";
+        return false;
         
+    }
+    
+    public Producto devolverProducto(String codigo){
+        
+        try{
+                String SQL="SELECT * FROM productos WHERE codigo=?";
+                con = cn.getConexion();
+                ps = con.prepareStatement(SQL);
+                ps.setString(1, codigo);
+                rs=ps.executeQuery();
+                if(rs.next()){
+                    Producto prod = new Producto();
+                    prod.setCodigo(rs.getString("codigo"));
+                    prod.setDescripcion(rs.getString("descripcion"));
+                    prod.setStock(rs.getInt("stock"));
+                    prod.setProveedor(rs.getString("proveedor"));
+                    prod.setPrecio(rs.getFloat("precio"));
+                    return prod;
+            }
+            
+        }catch(SQLException e){
+            System.out.println(e.toString());
+        }return null;
     }
     
     public void rellenarListaProveedores(JComboBox lista){
@@ -69,10 +86,9 @@ public class ProductoDAO {
     public boolean actualizarStockPrecio(Producto prod,String codigo){
         
         try {
-            
-            
              
             String sql="UPDATE productos SET stock=stock+?,precio=(precio*stock+?*?)/(stock+?) WHERE codigo=?";
+                con = cn.getConexion();
                 ps = con.prepareStatement(sql);
                 ps.setInt(1, prod.getStock());
                 ps.setFloat(2, prod.getPrecio());
@@ -115,13 +131,12 @@ public class ProductoDAO {
          return true;
     }
     
-    public void modificarProducto(JTable tabla,Producto prod){
-        int filaSel = tabla.getSelectedRow();
-        String codigo = tabla.getValueAt(filaSel, 0).toString();//Almacena la fila seleccionada y su código
+    public void modificarProducto(String codigo,Producto prod){
 
         try {
             String SQL="UPDATE productos SET codigo=?,descripcion=?,proveedor=?,stock=?,precio=? "
                     + "WHERE codigo=?"; //Consulta para actualizar la fila
+            con = cn.getConexion();
             ps = con.prepareStatement(SQL);
             ps.setString(1, prod.getCodigo());
             ps.setString(2, prod.getDescripcion());
@@ -160,12 +175,11 @@ public class ProductoDAO {
         return listaProd;
     }
     
-     public void eliminarProducto(JTable tabla){
-     int filaSel = tabla.getSelectedRow();//Almacena la fila selecionada
-     String codigo = tabla.getValueAt(filaSel, 0).toString();//Obtiene su código
+     public void eliminarProducto(String codigo){
      
      try {
          String SQL="DELETE FROM productos WHERE codigo=?"; //Elimina la fila mediante SQL
+         con = cn.getConexion();
          ps=con.prepareStatement(SQL);
          ps.setString(1, codigo);
          ps.executeUpdate();
@@ -175,4 +189,21 @@ public class ProductoDAO {
      }
  }
     
+     
+     public void actualizarStockVenta(List<Detalle> listaDetalle){
+         String SQL="UPDATE productos SET stock=stock-? WHERE codigo=? ";
+         try {
+             con=cn.getConexion();
+             ps=con.prepareStatement(SQL);
+             
+             for(Detalle detalle: listaDetalle ){
+                 ps.setInt(1,detalle.getCantidad());
+                 ps.setString(2, detalle.getCodigoProducto());
+                 ps.addBatch();
+             }
+             ps.executeBatch();
+             ps.close();
+         } catch (SQLException e) {
+         }
+     }
 }

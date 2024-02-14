@@ -19,7 +19,7 @@ public class Conexion {
 
     public Conexion() {
         // La conexión se abre solo cuando se instancia la clase, pero no se cierra aquí.
-        // Debes cerrarla de manera explícita en el código que la use.
+        // Se debe cerrar de manera explícita en el código que la use.
     }
 
     public Connection getConexion() throws SQLException {
